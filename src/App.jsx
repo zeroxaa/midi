@@ -1,66 +1,211 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Music4, Piano, Play, RotateCcw, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock3,
+  Music4,
+  Piano,
+  Play,
+  RotateCcw,
+  Square,
+  TimerReset,
+  XCircle,
+} from "lucide-react";
 
 const BUILT_IN_LESSONS = [
   {
     id: "twinkle",
     title: "Twinkle Twinkle",
+    meter: "4/4",
     notes: [
-      "C4",
-      "C4",
-      "G4",
-      "G4",
-      "A4",
-      "A4",
-      "G4",
-      "F4",
-      "F4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "C4",
+      { note: "C4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "G4", beats: 2 },
+      { note: "F4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 2 },
     ],
   },
   {
     id: "mary",
     title: "Mary Had a Little Lamb",
+    meter: "4/4",
     notes: [
-      "E4",
-      "D4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "D4",
-      "E4",
-      "G4",
-      "G4",
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 2 },
+      { note: "D4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "D4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 2 },
     ],
   },
   {
     id: "ode",
     title: "Ode to Joy",
+    meter: "4/4",
     notes: [
-      "E4",
-      "E4",
-      "F4",
-      "G4",
-      "G4",
-      "F4",
-      "E4",
-      "D4",
-      "C4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "D4", beats: 2 },
+    ],
+  },
+  {
+    id: "hotcrossbuns",
+    title: "Hot Cross Buns",
+    meter: "4/4",
+    notes: [
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 2 },
+      { note: "C4", beats: 0.5 },
+      { note: "C4", beats: 0.5 },
+      { note: "C4", beats: 0.5 },
+      { note: "C4", beats: 0.5 },
+      { note: "D4", beats: 0.5 },
+      { note: "D4", beats: 0.5 },
+      { note: "D4", beats: 0.5 },
+      { note: "D4", beats: 0.5 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 2 },
+    ],
+  },
+  {
+    id: "jinglebells",
+    title: "Jingle Bells",
+    meter: "4/4",
+    notes: [
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 4 },
+      { note: "F4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 2 },
+      { note: "G4", beats: 2 },
+    ],
+  },
+  {
+    id: "londonbridge",
+    title: "London Bridge",
+    meter: "4/4",
+    notes: [
+      { note: "G4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 2 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 2 },
+      { note: "G4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 2 },
+      { note: "D4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "C4", beats: 1 },
+    ],
+  },
+  {
+    id: "oldmacdonald",
+    title: "Old MacDonald",
+    meter: "4/4",
+    notes: [
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 2 },
+      { note: "B4", beats: 1 },
+      { note: "B4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "A4", beats: 1 },
+      { note: "G4", beats: 4 },
+    ],
+  },
+  {
+    id: "saints",
+    title: "When the Saints Go Marching In",
+    meter: "4/4",
+    notes: [
+      { note: "C4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "F4", beats: 1 },
+      { note: "G4", beats: 1 },
+      { note: "G4", beats: 2 },
+      { note: "F4", beats: 2 },
+      { note: "E4", beats: 1 },
+      { note: "C4", beats: 1 },
+      { note: "E4", beats: 1 },
+      { note: "D4", beats: 1 },
+      { note: "C4", beats: 4 },
     ],
   },
 ];
@@ -151,22 +296,102 @@ function createKeyboardRange(startNote, endNote) {
   return keys;
 }
 
-function parseCustomNotes(input) {
-  const tokens = input
-    .split(/[\s,|]+/)
-    .map((token) => token.trim().toUpperCase())
-    .filter(Boolean)
-    .map((token) => token.replace(/^([A-G])B(\d)$/, (_, note, octave) => {
-      const flatMap = { AB: "G#", BB: "A#", DB: "C#", EB: "D#", GB: "F#" };
-      const mapped = flatMap[`${note}B`];
-      return mapped ? `${mapped}${octave}` : `${note}${octave}`;
-    }));
+function parseCustomEvents(input) {
+  const normalized = input.replace(/\|/g, " ");
+  const rawTokens = normalized.split(/[\s,]+/).map((token) => token.trim()).filter(Boolean);
 
-  return tokens.filter((token) => noteToMidi(token) !== null);
+  return rawTokens
+    .map((token) => {
+      const [rawNote, rawBeats] = token.split(":");
+      const cleaned = rawNote
+        .toUpperCase()
+        .replace(/^([A-G])B(\d)$/, (_, pitch, octave) => {
+          const flatMap = { AB: "G#", BB: "A#", DB: "C#", EB: "D#", GB: "F#" };
+          const mapped = flatMap[`${pitch}B`];
+          return mapped ? `${mapped}${octave}` : `${pitch}${octave}`;
+        });
+
+      const beats = rawBeats ? Number(rawBeats) : 1;
+      if (noteToMidi(cleaned) == null || Number.isNaN(beats) || beats <= 0) {
+        return null;
+      }
+
+      return { note: cleaned, beats };
+    })
+    .filter(Boolean);
 }
 
 function prettyNote(note) {
   return note.replace("#", "♯");
+}
+
+function parseMeterBeats(meter) {
+  const [top] = meter.split("/");
+  const beats = Number(top);
+  return Number.isFinite(beats) && beats > 0 ? beats : 4;
+}
+
+function durationToAbc(beats) {
+  if (beats === 1) return "";
+  if (beats === 0.5) return "/";
+  if (beats === 0.25) return "//";
+  if (Number.isInteger(beats)) return String(beats);
+  if (beats === 1.5) return "3/2";
+  if (beats === 0.75) return "3/4";
+
+  const scaled = Math.round(beats * 4);
+  const gcd = greatestCommonDivisor(scaled, 4);
+  const numerator = scaled / gcd;
+  const denominator = 4 / gcd;
+  return `${numerator}/${denominator}`;
+}
+
+function greatestCommonDivisor(a, b) {
+  if (!b) return a;
+  return greatestCommonDivisor(b, a % b);
+}
+
+function noteToAbc(note) {
+  const match = /^([A-G])(#?)(\d)$/.exec(note);
+  if (!match) return "C";
+
+  const [, pitch, sharp, octaveText] = match;
+  const octave = Number(octaveText);
+  const accidental = sharp ? "^" : "";
+
+  if (octave <= 3) {
+    return `${accidental}${pitch.toUpperCase()},`;
+  }
+  if (octave === 4) {
+    return `${accidental}${pitch.toUpperCase()}`;
+  }
+  if (octave === 5) {
+    return `${accidental}${pitch.toLowerCase()}`;
+  }
+  return `${accidental}${pitch.toLowerCase()}'`;
+}
+
+function lessonToAbc(lesson) {
+  const measureBeats = parseMeterBeats(lesson.meter);
+  let running = 0;
+  const body = [];
+
+  lesson.notes.forEach((event, index) => {
+    body.push(`${noteToAbc(event.note)}${durationToAbc(event.beats)}`);
+    running += event.beats;
+
+    const atMeasureBoundary = Math.abs(running % measureBeats) < 0.0001;
+    if (atMeasureBoundary && index !== lesson.notes.length - 1) {
+      body.push("|");
+    }
+  });
+
+  return `X:1\nT:${lesson.title}\nM:${lesson.meter}\nL:1/4\nK:C clef=treble\n${body.join(" ")} |]`;
+}
+
+function formatDeltaMs(deltaMs) {
+  const rounded = Math.round(Math.abs(deltaMs));
+  return `${rounded}ms`;
 }
 
 function StatCard({ label, value, tone = "neutral" }) {
@@ -232,26 +457,39 @@ function PianoKey({ note, active, expected, onPress }) {
 }
 
 export default function VirtualPianoTrainer() {
-  const [customInput, setCustomInput] = useState("C4 D4 E4 F4 G4 A4 B4 C5");
+  const [customInput, setCustomInput] = useState("C4:1 D4:1 E4:1 F4:1 G4:1 A4:1 B4:1 C5:2");
   const [selectedLessonId, setSelectedLessonId] = useState(BUILT_IN_LESSONS[0].id);
+  const [practiceMode, setPracticeMode] = useState("rhythm");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastPlayed, setLastPlayed] = useState("");
-  const [feedback, setFeedback] = useState("idle");
+  const [feedback, setFeedback] = useState({ kind: "idle", text: "Press start or play the highlighted note." });
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+  const [missedCount, setMissedCount] = useState(0);
+  const [onTimeCount, setOnTimeCount] = useState(0);
   const [previewIndex, setPreviewIndex] = useState(-1);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(true);
+  const [bpm, setBpm] = useState(80);
+  const [toleranceMs, setToleranceMs] = useState(220);
+  const [metronomeEnabled, setMetronomeEnabled] = useState(true);
+  const [countInBeats, setCountInBeats] = useState(4);
+  const [isRunning, setIsRunning] = useState(false);
+  const [transportStartAt, setTransportStartAt] = useState(null);
+  const [nowMs, setNowMs] = useState(0);
 
   const audioContextRef = useRef(null);
   const previewTimeoutsRef = useRef([]);
+  const metronomeIntervalRef = useRef(null);
+  const staffContainerRef = useRef(null);
 
   const customLesson = useMemo(() => {
-    const notes = parseCustomNotes(customInput);
+    const notes = parseCustomEvents(customInput);
     if (notes.length === 0) return null;
     return {
       id: "custom",
       title: "Custom exercise",
+      meter: "4/4",
       notes,
     };
   }, [customInput]);
@@ -260,11 +498,30 @@ export default function VirtualPianoTrainer() {
     return customLesson ? [...BUILT_IN_LESSONS, customLesson] : BUILT_IN_LESSONS;
   }, [customLesson]);
 
+  useEffect(() => {
+    if (!lessons.some((lesson) => lesson.id === selectedLessonId)) {
+      setSelectedLessonId(BUILT_IN_LESSONS[0].id);
+    }
+  }, [lessons, selectedLessonId]);
+
   const currentLesson = lessons.find((lesson) => lesson.id === selectedLessonId) ?? lessons[0];
   const notes = currentLesson.notes;
-  const expectedNote = notes[currentIndex] ?? null;
+  const measureBeats = parseMeterBeats(currentLesson.meter);
+  const noteStartBeats = useMemo(() => {
+    let running = 0;
+    return notes.map((event) => {
+      const start = running;
+      running += event.beats;
+      return start;
+    });
+  }, [notes]);
+  const totalBeats = useMemo(() => notes.reduce((sum, event) => sum + event.beats, 0), [notes]);
+  const expectedEvent = notes[currentIndex] ?? null;
+  const expectedNote = expectedEvent?.note ?? null;
   const progress = notes.length ? Math.round((currentIndex / notes.length) * 100) : 0;
   const accuracy = correctCount + wrongCount > 0 ? Math.round((correctCount / (correctCount + wrongCount)) * 100) : 100;
+  const beatMs = 60000 / bpm;
+  const abcSource = useMemo(() => lessonToAbc(currentLesson), [currentLesson]);
 
   const visibleKeyboard = useMemo(() => {
     return KEYBOARD_RANGE.map((key) => ({
@@ -280,6 +537,34 @@ export default function VirtualPianoTrainer() {
     resetSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLessonId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function renderStaff() {
+      if (!staffContainerRef.current) return;
+      const abcjs = await import("abcjs");
+      if (cancelled || !staffContainerRef.current) return;
+
+      staffContainerRef.current.innerHTML = "";
+      abcjs.renderAbc(staffContainerRef.current, abcSource, {
+        responsive: "resize",
+        staffwidth: 900,
+        add_classes: true,
+        scale: 1.1,
+        paddingtop: 10,
+        paddingbottom: 10,
+      });
+    }
+
+    renderStaff();
+    return () => {
+      cancelled = true;
+      if (staffContainerRef.current) {
+        staffContainerRef.current.innerHTML = "";
+      }
+    };
+  }, [abcSource]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -299,11 +584,65 @@ export default function VirtualPianoTrainer() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [visibleKeyboard, expectedNote, currentIndex, isPreviewing]);
+  }, [visibleKeyboard, practiceMode, currentIndex, isRunning, transportStartAt, toleranceMs, bpm]);
 
   useEffect(() => {
-    return () => clearPreviewTimeouts();
+    return () => {
+      clearPreviewTimeouts();
+      stopMetronome();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isRunning) return undefined;
+
+    let rafId = 0;
+    const updateClock = () => {
+      setNowMs(performance.now());
+      rafId = window.requestAnimationFrame(updateClock);
+    };
+    rafId = window.requestAnimationFrame(updateClock);
+    return () => window.cancelAnimationFrame(rafId);
+  }, [isRunning]);
+
+  useEffect(() => {
+    if (!isRunning || practiceMode !== "rhythm" || transportStartAt == null || currentIndex >= notes.length) {
+      return undefined;
+    }
+
+    const expectedAt = transportStartAt + noteStartBeats[currentIndex] * beatMs;
+    const msUntilMiss = Math.max(0, expectedAt + toleranceMs - performance.now());
+
+    const timeoutId = window.setTimeout(() => {
+      setWrongCount((count) => count + 1);
+      setMissedCount((count) => count + 1);
+      setFeedback({
+        kind: "missed",
+        text: `Missed ${prettyNote(notes[currentIndex].note)} — move to the next beat.`,
+      });
+      setCurrentIndex((index) => index + 1);
+    }, msUntilMiss);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isRunning, practiceMode, transportStartAt, currentIndex, noteStartBeats, beatMs, toleranceMs, notes]);
+
+  useEffect(() => {
+    if (currentIndex < notes.length) return;
+    stopMetronome();
+    setIsRunning(false);
+    setTransportStartAt(null);
+    setFeedback({ kind: "complete", text: "Exercise complete." });
+  }, [currentIndex, notes.length]);
+
+  useEffect(() => {
+    if (!isRunning || practiceMode !== "rhythm" || transportStartAt == null) return;
+
+    const remaining = transportStartAt - nowMs;
+    if (remaining > 0) {
+      const beatsLeft = Math.max(1, Math.ceil(remaining / beatMs));
+      setFeedback({ kind: "countin", text: `Count in: ${beatsLeft}` });
+    }
+  }, [isRunning, practiceMode, transportStartAt, nowMs, beatMs]);
 
   function clearPreviewTimeouts() {
     previewTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
@@ -346,15 +685,134 @@ export default function VirtualPianoTrainer() {
     oscillator.stop(audioContext.currentTime + duration + 0.03);
   }
 
-  function resetSession() {
-    clearPreviewTimeouts();
+  async function playMetronomeClick(accent = false) {
+    const audioContext = getAudioContext();
+    if (!audioContext) return;
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "square";
+    oscillator.frequency.value = accent ? 1320 : 880;
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(accent ? 0.15 : 0.1, audioContext.currentTime + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.06);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.08);
+  }
+
+  function stopMetronome() {
+    if (metronomeIntervalRef.current) {
+      window.clearInterval(metronomeIntervalRef.current);
+      metronomeIntervalRef.current = null;
+    }
+  }
+
+  function startMetronome() {
+    stopMetronome();
+    if (!metronomeEnabled) return;
+
+    let beatIndex = 0;
+    playMetronomeClick(true);
+    metronomeIntervalRef.current = window.setInterval(() => {
+      beatIndex += 1;
+      const accent = beatIndex % measureBeats === 0;
+      playMetronomeClick(accent);
+    }, beatMs);
+  }
+
+  function resetCounters() {
     setCurrentIndex(0);
     setLastPlayed("");
-    setFeedback("idle");
     setCorrectCount(0);
     setWrongCount(0);
-    setPreviewIndex(-1);
+    setMissedCount(0);
+    setOnTimeCount(0);
+  }
+
+  function resetSession() {
+    clearPreviewTimeouts();
+    stopMetronome();
     setIsPreviewing(false);
+    setPreviewIndex(-1);
+    setIsRunning(false);
+    setTransportStartAt(null);
+    setNowMs(0);
+    resetCounters();
+    setFeedback({ kind: "idle", text: "Press start or play the highlighted note." });
+  }
+
+  function startRhythmRun() {
+    clearPreviewTimeouts();
+    resetCounters();
+    const startAt = performance.now() + countInBeats * beatMs;
+    setTransportStartAt(startAt);
+    setNowMs(performance.now());
+    setIsRunning(true);
+    setFeedback({ kind: "countin", text: `Count in: ${countInBeats}` });
+    startMetronome();
+  }
+
+  function stopRhythmRun() {
+    stopMetronome();
+    setIsRunning(false);
+    setTransportStartAt(null);
+    setFeedback({ kind: "idle", text: "Stopped. Press start to try again." });
+  }
+
+  function handleOrderModePress(noteName) {
+    if (!expectedNote) {
+      setFeedback({ kind: "complete", text: "Exercise complete." });
+      return;
+    }
+
+    if (noteName === expectedNote) {
+      const nextIndex = currentIndex + 1;
+      setCorrectCount((count) => count + 1);
+      setFeedback({ kind: "correct", text: nextIndex >= notes.length ? "Exercise complete." : "Correct — keep going." });
+      setCurrentIndex(nextIndex);
+    } else {
+      setWrongCount((count) => count + 1);
+      setFeedback({ kind: "wrong", text: `Expected ${prettyNote(expectedNote)}.` });
+    }
+  }
+
+  function handleRhythmModePress(noteName) {
+    if (!expectedEvent || transportStartAt == null) return;
+
+    const now = performance.now();
+    const expectedAt = transportStartAt + noteStartBeats[currentIndex] * beatMs;
+    const delta = now - expectedAt;
+
+    if (noteName !== expectedEvent.note) {
+      setWrongCount((count) => count + 1);
+      setFeedback({ kind: "wrong", text: `Wrong pitch — expected ${prettyNote(expectedEvent.note)}.` });
+      return;
+    }
+
+    if (Math.abs(delta) <= toleranceMs) {
+      setCorrectCount((count) => count + 1);
+      setOnTimeCount((count) => count + 1);
+      setFeedback({ kind: "correct", text: `On time (${formatDeltaMs(delta)}).` });
+      setCurrentIndex((index) => index + 1);
+      return;
+    }
+
+    if (delta < -toleranceMs) {
+      setWrongCount((count) => count + 1);
+      setFeedback({ kind: "early", text: `Too early by ${formatDeltaMs(delta)}.` });
+      return;
+    }
+
+    setWrongCount((count) => count + 1);
+    setFeedback({ kind: "late", text: `Late by ${formatDeltaMs(delta)}.` });
+    setCurrentIndex((index) => index + 1);
   }
 
   function handleNotePress(noteName) {
@@ -363,20 +821,22 @@ export default function VirtualPianoTrainer() {
     setLastPlayed(noteName);
     playTone(noteName);
 
-    if (!expectedNote) {
-      setFeedback("complete");
+    if (practiceMode === "order") {
+      handleOrderModePress(noteName);
       return;
     }
 
-    if (noteName === expectedNote) {
-      const nextIndex = currentIndex + 1;
-      setCorrectCount((count) => count + 1);
-      setFeedback(nextIndex >= notes.length ? "complete" : "correct");
-      setCurrentIndex(nextIndex);
-    } else {
-      setWrongCount((count) => count + 1);
-      setFeedback("wrong");
+    if (!isRunning) {
+      setFeedback({ kind: "idle", text: "Press start to begin the timed run." });
+      return;
     }
+
+    if (transportStartAt != null && performance.now() < transportStartAt - toleranceMs) {
+      setFeedback({ kind: "countin", text: "Wait for the count-in." });
+      return;
+    }
+
+    handleRhythmModePress(noteName);
   }
 
   function previewLesson() {
@@ -386,43 +846,43 @@ export default function VirtualPianoTrainer() {
     setIsPreviewing(true);
     setPreviewIndex(-1);
 
-    notes.forEach((note, index) => {
+    let runningBeats = 0;
+    notes.forEach((event, index) => {
+      const startDelay = runningBeats * beatMs;
       const timeoutId = window.setTimeout(() => {
         setPreviewIndex(index);
-        playTone(note, 0.4);
-      }, index * 500);
+        playTone(event.note, Math.max(0.16, event.beats * 0.3));
+      }, startDelay);
       previewTimeoutsRef.current.push(timeoutId);
+      runningBeats += event.beats;
     });
 
     const endingId = window.setTimeout(() => {
       setPreviewIndex(-1);
       setIsPreviewing(false);
-    }, notes.length * 500 + 100);
+    }, runningBeats * beatMs + 120);
     previewTimeoutsRef.current.push(endingId);
   }
 
-  const statusTone =
-    feedback === "correct"
-      ? "text-emerald-300"
-      : feedback === "wrong"
-      ? "text-rose-300"
-      : feedback === "complete"
-      ? "text-blue-300"
-      : "text-zinc-300";
+  const statusTone = {
+    idle: "text-zinc-300",
+    correct: "text-emerald-300",
+    wrong: "text-rose-300",
+    missed: "text-amber-300",
+    early: "text-amber-300",
+    late: "text-orange-300",
+    countin: "text-blue-300",
+    complete: "text-blue-300",
+  }[feedback.kind] ?? "text-zinc-300";
 
-  const statusLabel =
-    feedback === "correct"
-      ? "Correct — keep going"
-      : feedback === "wrong"
-      ? "Not that one — try the highlighted note"
-      : feedback === "complete"
-      ? "Exercise complete"
-      : "Press the highlighted note to start";
+  const currentBeatNumber = isRunning && transportStartAt != null
+    ? Math.max(0, Math.floor((nowMs - transportStartAt) / beatMs) + 1)
+    : 0;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
           <div className="rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 shadow-2xl">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
@@ -431,21 +891,20 @@ export default function VirtualPianoTrainer() {
                   Virtual piano trainer
                 </div>
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                  Practice now, wire MIDI later.
+                  Real staff, timed notes, metronome.
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 md:text-base">
-                  This MVP behaves like a beginner piano-learning app: it shows a note sequence,
-                  listens for input from a virtual keyboard, checks whether you played the expected
-                  note, and advances only when you get it right.
+                  The lesson is rendered as sheet music with abcjs, and rhythm mode grades your input
+                  against a tempo instead of just checking note order.
                 </p>
               </div>
 
-              <div className="grid min-w-[220px] gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+              <div className="grid min-w-[240px] gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
                 <label className="text-xs uppercase tracking-[0.18em] text-zinc-400">Exercise</label>
                 <select
                   value={selectedLessonId}
                   onChange={(event) => setSelectedLessonId(event.target.value)}
-                  className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none ring-0 transition focus:border-blue-500"
+                  className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none transition focus:border-blue-500"
                 >
                   {lessons.map((lesson) => (
                     <option key={lesson.id} value={lesson.id}>
@@ -453,6 +912,33 @@ export default function VirtualPianoTrainer() {
                     </option>
                   ))}
                 </select>
+
+                <label className="text-xs uppercase tracking-[0.18em] text-zinc-400">Mode</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPracticeMode("order")}
+                    className={`rounded-xl border px-3 py-2 text-sm transition ${
+                      practiceMode === "order"
+                        ? "border-blue-500 bg-blue-600 text-white"
+                        : "border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-zinc-500"
+                    }`}
+                  >
+                    Order only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPracticeMode("rhythm")}
+                    className={`rounded-xl border px-3 py-2 text-sm transition ${
+                      practiceMode === "rhythm"
+                        ? "border-blue-500 bg-blue-600 text-white"
+                        : "border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-zinc-500"
+                    }`}
+                  >
+                    Rhythm + tempo
+                  </button>
+                </div>
+
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -469,17 +955,18 @@ export default function VirtualPianoTrainer() {
                     disabled={isPreviewing}
                   >
                     <Play className="h-4 w-4" />
-                    Hear notes
+                    Hear lesson
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-4">
+            <div className="mt-6 grid gap-4 md:grid-cols-5">
               <StatCard label="Progress" value={`${progress}%`} tone="accent" />
               <StatCard label="Correct" value={correctCount} tone="good" />
               <StatCard label="Wrong" value={wrongCount} tone="bad" />
-              <StatCard label="Accuracy" value={`${accuracy}%`} />
+              <StatCard label="On time" value={onTimeCount} tone="good" />
+              <StatCard label="Missed" value={missedCount} />
             </div>
 
             <div className="mt-6 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4 md:p-5">
@@ -491,7 +978,7 @@ export default function VirtualPianoTrainer() {
                     {currentLesson.title}
                   </div>
                 </div>
-                <div className={`text-sm font-medium ${statusTone}`}>{statusLabel}</div>
+                <div className={`text-sm font-medium ${statusTone}`}>{feedback.text}</div>
               </div>
 
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-800">
@@ -501,40 +988,8 @@ export default function VirtualPianoTrainer() {
                 />
               </div>
 
-              <div className="mt-5 overflow-x-auto pb-2">
-                <div className="flex min-w-max items-center gap-2">
-                  {notes.map((note, index) => {
-                    const isCurrent = index === currentIndex && feedback !== "complete";
-                    const isPassed = index < currentIndex;
-                    const isPreview = index === previewIndex;
-
-                    return (
-                      <motion.div
-                        key={`${note}-${index}`}
-                        layout
-                        className={[
-                          "flex h-16 min-w-[72px] items-center justify-center rounded-2xl border px-3 text-sm font-semibold shadow-sm transition-all",
-                          isPassed
-                            ? "border-emerald-800 bg-emerald-950/60 text-emerald-200"
-                            : isCurrent
-                            ? "border-blue-700 bg-blue-950/60 text-blue-100"
-                            : isPreview
-                            ? "border-amber-700 bg-amber-950/50 text-amber-100"
-                            : "border-zinc-800 bg-zinc-950 text-zinc-300",
-                        ].join(" ")}
-                        animate={isCurrent || isPreview ? { y: [0, -4, 0] } : { y: 0 }}
-                        transition={{ duration: 0.6, repeat: isCurrent || isPreview ? Infinity : 0 }}
-                      >
-                        <div className="text-center">
-                          <div>{prettyNote(note)}</div>
-                          <div className="mt-1 text-[10px] font-normal uppercase tracking-[0.16em] text-zinc-500">
-                            {Math.floor(index / 4) + 1}.{(index % 4) + 1}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+              <div className="mt-5 rounded-2xl border border-zinc-800 bg-white p-3 text-zinc-900 shadow-inner md:p-5">
+                <div ref={staffContainerRef} className="w-full overflow-x-auto" />
               </div>
             </div>
           </div>
@@ -556,7 +1011,49 @@ export default function VirtualPianoTrainer() {
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-3">
+              <div className="mt-5 grid gap-3">
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="flex items-center justify-between text-sm text-zinc-300">
+                    <span className="flex items-center gap-2"><Clock3 className="h-4 w-4" /> BPM</span>
+                    <span className="font-semibold text-white">{bpm}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="160"
+                    step="1"
+                    value={bpm}
+                    onChange={(event) => setBpm(Number(event.target.value))}
+                    className="mt-3 w-full"
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="flex items-center justify-between text-sm text-zinc-300">
+                    <span className="flex items-center gap-2"><TimerReset className="h-4 w-4" /> Timing tolerance</span>
+                    <span className="font-semibold text-white">±{toleranceMs}ms</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="80"
+                    max="400"
+                    step="10"
+                    value={toleranceMs}
+                    onChange={(event) => setToleranceMs(Number(event.target.value))}
+                    className="mt-3 w-full"
+                  />
+                </div>
+
+                <label className="inline-flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">
+                  <span>Metronome</span>
+                  <input
+                    type="checkbox"
+                    checked={metronomeEnabled}
+                    onChange={(event) => setMetronomeEnabled(event.target.checked)}
+                    className="h-4 w-4 rounded border-zinc-600 bg-zinc-900"
+                  />
+                </label>
+
                 <label className="inline-flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">
                   <span>Show keyboard shortcuts</span>
                   <input
@@ -567,16 +1064,54 @@ export default function VirtualPianoTrainer() {
                   />
                 </label>
 
+                {practiceMode === "rhythm" ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={startRhythmRun}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
+                    >
+                      <Play className="h-4 w-4" />
+                      Start run
+                    </button>
+                    <button
+                      type="button"
+                      onClick={stopRhythmRun}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900"
+                    >
+                      <Square className="h-4 w-4" />
+                      Stop
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
+                  <div className="grid gap-2">
+                    <div className="flex items-center justify-between">
+                      <span>Beat duration</span>
+                      <span className="text-zinc-200">{Math.round(beatMs)}ms</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Current beat</span>
+                      <span className="text-zinc-200">{currentBeatNumber || "—"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Total beats</span>
+                      <span className="text-zinc-200">{totalBeats}</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
                   <div className="flex items-start gap-3">
-                    {feedback === "wrong" ? (
+                    {feedback.kind === "wrong" || feedback.kind === "late" ? (
                       <XCircle className="mt-0.5 h-4 w-4 flex-none text-rose-400" />
                     ) : (
                       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-400" />
                     )}
                     <div>
-                      In a real version, this exact input layer can be swapped with Web MIDI so a
-                      physical keyboard drives the same practice engine.
+                      The notation is separate from the input engine. Later, you can swap the
+                      virtual keyboard for Web MIDI without changing the staff or rhythm scheduler.
                     </div>
                   </div>
                 </div>
@@ -585,16 +1120,15 @@ export default function VirtualPianoTrainer() {
 
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 shadow-xl">
               <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Custom exercise</div>
-              <div className="mt-2 text-lg font-medium text-white">Paste your own note sequence</div>
+              <div className="mt-2 text-lg font-medium text-white">Paste notes with durations</div>
               <p className="mt-2 text-sm leading-6 text-zinc-400">
-                Use note names like C4 D4 E4 F4 or G4,A4,B4,C5. When valid notes are present, the
-                custom exercise appears in the lesson selector.
+                Use note:beats pairs like C4:1 D4:1 E4:0.5 F4:0.5 G4:2. The custom exercise shows up in the selector automatically.
               </p>
               <textarea
                 value={customInput}
                 onChange={(event) => setCustomInput(event.target.value)}
                 className="mt-4 min-h-[120px] w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-blue-500"
-                placeholder="C4 D4 E4 F4 G4"
+                placeholder="C4:1 D4:1 E4:0.5 F4:0.5 G4:2"
               />
               <div className="mt-3 text-xs uppercase tracking-[0.16em] text-zinc-500">
                 Parsed notes: {customLesson ? customLesson.notes.length : 0}
@@ -610,7 +1144,7 @@ export default function VirtualPianoTrainer() {
               <div className="mt-1 text-xl font-semibold text-white">Virtual piano keyboard</div>
             </div>
             <div className="text-sm text-zinc-400">
-              Click a key or use your computer keyboard. The highlighted key is the expected note.
+              Click a key or use your computer keyboard. In rhythm mode, notes are scored against the tempo.
             </div>
           </div>
 

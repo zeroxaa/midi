@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Soundfont from "soundfont-player";
+import * as Tone from "tone";
 import {
   CheckCircle2,
   Clock3,
@@ -14,15 +15,51 @@ import {
 } from "lucide-react";
 
 const INSTRUMENTS = [
-  { id: "acoustic_grand_piano", label: "Acoustic Grand Piano" },
-  { id: "bright_acoustic_piano", label: "Bright Acoustic Piano" },
-  { id: "electric_piano_1", label: "Electric Piano" },
-  { id: "honkytonk_piano", label: "Honky-tonk Piano" },
-  { id: "harpsichord", label: "Harpsichord" },
-  { id: "celesta", label: "Celesta" },
-  { id: "music_box", label: "Music Box" },
-  { id: "vibraphone", label: "Vibraphone" },
+  { id: "acoustic_grand_piano", label: "Acoustic Grand Piano", source: "soundfont" },
+  { id: "salamander", label: "Salamander Grand (HQ ~50MB)", source: "salamander" },
+  { id: "bright_acoustic_piano", label: "Bright Acoustic Piano", source: "soundfont" },
+  { id: "electric_piano_1", label: "Electric Piano", source: "soundfont" },
+  { id: "honkytonk_piano", label: "Honky-tonk Piano", source: "soundfont" },
+  { id: "harpsichord", label: "Harpsichord", source: "soundfont" },
+  { id: "celesta", label: "Celesta", source: "soundfont" },
+  { id: "music_box", label: "Music Box", source: "soundfont" },
+  { id: "vibraphone", label: "Vibraphone", source: "soundfont" },
 ];
+
+const SALAMANDER_URLS = {
+  A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3",
+  A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3",
+  A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+  A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+  A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+  A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3",
+  A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3",
+  A7: "A7.mp3", C8: "C8.mp3",
+};
+
+function loadSalamander() {
+  return new Promise((resolve, reject) => {
+    try {
+      const sampler = new Tone.Sampler({
+        urls: SALAMANDER_URLS,
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+        release: 1,
+        onload: () => {
+          resolve({
+            play(note, _time, options) {
+              Tone.start();
+              const velocity = Math.min(1, Math.max(0.05, options?.gain ?? 0.7));
+              sampler.triggerAttackRelease(note, options?.duration ?? 0.5, undefined, velocity);
+            },
+          });
+        },
+        onerror: (err) => reject(err),
+      }).toDestination();
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 const BUILT_IN_LESSONS = [
   {
@@ -368,6 +405,45 @@ const BUILT_IN_LESSONS = [
       { note: "D5", beats: 1 },
       { notes: ["G4", "B4", "D5"], beats: 1 },
       { notes: ["C4", "E4", "G4"], beats: 4 },
+    ],
+  },
+  {
+    id: "canon",
+    title: "Pachelbel's Canon (simplified)",
+    meter: "4/4",
+    notes: [
+      { rh: ["F#5"], lh: ["D3"], beats: 1 },
+      { rh: ["E5"], lh: [], beats: 1 },
+      { rh: ["D5"], lh: [], beats: 1 },
+      { rh: ["C#5"], lh: [], beats: 1 },
+      { rh: ["B4"], lh: ["A2"], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["B4"], lh: [], beats: 1 },
+      { rh: ["C#5"], lh: [], beats: 1 },
+      { rh: ["D5"], lh: ["B2"], beats: 1 },
+      { rh: ["C#5"], lh: [], beats: 1 },
+      { rh: ["B4"], lh: [], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["G4"], lh: ["F#2"], beats: 1 },
+      { rh: ["F#4"], lh: [], beats: 1 },
+      { rh: ["G4"], lh: [], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["B4"], lh: ["G2"], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["G4"], lh: [], beats: 1 },
+      { rh: ["F#4"], lh: [], beats: 1 },
+      { rh: ["E4"], lh: ["D3"], beats: 1 },
+      { rh: ["F#4"], lh: [], beats: 1 },
+      { rh: ["G4"], lh: [], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["B4"], lh: ["G2"], beats: 1 },
+      { rh: ["A4"], lh: [], beats: 1 },
+      { rh: ["G4"], lh: [], beats: 1 },
+      { rh: ["F#4"], lh: [], beats: 1 },
+      { rh: ["E4"], lh: ["A2"], beats: 1 },
+      { rh: ["D4"], lh: [], beats: 1 },
+      { rh: ["E4"], lh: [], beats: 1 },
+      { rh: ["F#4"], lh: [], beats: 1 },
     ],
   },
 ];
@@ -907,6 +983,7 @@ export default function VirtualPianoTrainer() {
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [midiStatus, setMidiStatus] = useState("idle");
   const [midiDevices, setMidiDevices] = useState([]);
+  const [staffArrowX, setStaffArrowX] = useState(null);
 
   const audioContextRef = useRef(null);
   const previewTimeoutsRef = useRef([]);
@@ -1008,14 +1085,38 @@ export default function VirtualPianoTrainer() {
       });
     }
 
-    renderStaff();
+    renderStaff().then(() => {
+      if (!cancelled) requestAnimationFrame(updateStaffArrow);
+    });
     return () => {
       cancelled = true;
       if (staffContainerRef.current) {
         staffContainerRef.current.innerHTML = "";
       }
     };
-  }, [abcSource]);
+  }, [abcSource, isFocusMode]);
+
+  function updateStaffArrow() {
+    if (!staffContainerRef.current) {
+      setStaffArrowX(null);
+      return;
+    }
+    const allNotes = staffContainerRef.current.querySelectorAll(".abcjs-note");
+    const targetIndex = isPreviewing && previewIndex >= 0 ? previewIndex : currentIndex;
+    const target = allNotes[targetIndex];
+    if (!target) {
+      setStaffArrowX(null);
+      return;
+    }
+    const containerRect = staffContainerRef.current.getBoundingClientRect();
+    const noteRect = target.getBoundingClientRect();
+    setStaffArrowX(noteRect.left + noteRect.width / 2 - containerRect.left);
+  }
+
+  useEffect(() => {
+    updateStaffArrow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, previewIndex, isPreviewing]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -1178,6 +1279,7 @@ export default function VirtualPianoTrainer() {
 
   function ensureInstrument() {
     const name = selectedInstrument;
+    const config = INSTRUMENTS.find((i) => i.id === name);
     if (instrumentRef.current?.name === name) return instrumentRef.current.player;
     if (instrumentLoadingRef.current?.name === name) return instrumentLoadingRef.current.promise;
 
@@ -1185,7 +1287,11 @@ export default function VirtualPianoTrainer() {
     if (!audioContext) return null;
 
     setInstrumentStatus("loading");
-    const promise = Soundfont.instrument(audioContext, name)
+    const loader = config?.source === "salamander"
+      ? loadSalamander()
+      : Soundfont.instrument(audioContext, name);
+
+    const promise = loader
       .then((player) => {
         if (instrumentLoadingRef.current?.name === name) {
           instrumentRef.current = { name, player };
@@ -1228,7 +1334,7 @@ export default function VirtualPianoTrainer() {
     oscillator.stop(audioContext.currentTime + duration + 0.03);
   }
 
-  async function playTone(noteName, duration = 0.45) {
+  async function playTone(noteName, duration = 0.45, gain = 0.8) {
     const audioContext = getAudioContext();
     if (!audioContext) return;
     if (audioContext.state === "suspended") {
@@ -1238,7 +1344,7 @@ export default function VirtualPianoTrainer() {
     ensureInstrument();
 
     if (instrumentRef.current?.name === selectedInstrument) {
-      instrumentRef.current.player.play(noteName, audioContext.currentTime, { duration });
+      instrumentRef.current.player.play(noteName, audioContext.currentTime, { duration, gain });
       return;
     }
 
@@ -1433,21 +1539,69 @@ export default function VirtualPianoTrainer() {
     setIsPreviewing(true);
     setPreviewIndex(-1);
 
+    const beatSec = beatMs / 1000;
+
+    const eventStartBeats = [];
     let runningBeats = 0;
+    notes.forEach((event) => {
+      eventStartBeats.push(runningBeats);
+      runningBeats += event.beats;
+    });
+    const totalBeats = runningBeats;
+
+    const nextLHIndexFor = new Map();
+    let lastLHIndex = -1;
     notes.forEach((event, index) => {
-      const startDelay = runningBeats * beatMs;
+      if (event.lh && event.lh.length > 0) {
+        if (lastLHIndex >= 0) nextLHIndexFor.set(lastLHIndex, index);
+        lastLHIndex = index;
+      }
+    });
+
+    notes.forEach((event, index) => {
+      const baseDelay = eventStartBeats[index] * beatMs;
+      const jitter = (Math.random() - 0.5) * 24;
+      const startDelay = Math.max(0, baseDelay + jitter);
+      const beatInMeasure = eventStartBeats[index] % measureBeats;
+      const isDownbeat = Math.abs(beatInMeasure) < 0.001;
+
+      const lhNoteSet = new Set((event.lh ?? []).map(toNoteName));
+      const allNotes = eventNotes(event);
+
       const timeoutId = window.setTimeout(() => {
         setPreviewIndex(index);
-        eventNotes(event).forEach((n) => playTone(n, Math.max(0.16, event.beats * 0.3)));
+
+        allNotes.forEach((note) => {
+          const isLH = lhNoteSet.has(note);
+          let duration;
+          if (isLH) {
+            const nextLH = nextLHIndexFor.get(index);
+            if (nextLH != null) {
+              const beatsUntil = eventStartBeats[nextLH] - eventStartBeats[index];
+              duration = (beatsUntil + 0.2) * beatSec;
+            } else {
+              duration = 2.5;
+            }
+          } else {
+            duration = Math.max(0.2, (event.beats + 0.15) * beatSec);
+          }
+
+          let gain;
+          if (isLH) gain = 0.5;
+          else if (isDownbeat) gain = 0.85;
+          else gain = 0.65;
+
+          playTone(note, duration, gain);
+        });
       }, startDelay);
+
       previewTimeoutsRef.current.push(timeoutId);
-      runningBeats += event.beats;
     });
 
     const endingId = window.setTimeout(() => {
       setPreviewIndex(-1);
       setIsPreviewing(false);
-    }, runningBeats * beatMs + 120);
+    }, totalBeats * beatMs + 2500);
     previewTimeoutsRef.current.push(endingId);
   }
 
@@ -1466,34 +1620,40 @@ export default function VirtualPianoTrainer() {
     ? Math.max(0, Math.floor((nowMs - transportStartAt) / beatMs) + 1)
     : 0;
 
+  const keyboardWidth = whiteKeys.length * 56;
+
+  const keysBlock = (
+    <div className="relative" style={{ width: `${keyboardWidth}px` }}>
+      <div className="flex items-start">
+        {whiteKeys.map((key) => (
+          <PianoKey
+            key={key.note}
+            note={key}
+            active={lastPlayed === key.note}
+            expected={expectedHandMap.get(key.note) ?? null}
+            finger={expectedFingerMap.get(key.note) ?? null}
+            onPress={handleNotePress}
+          />
+        ))}
+      </div>
+      {blackKeys.map((key) => (
+        <PianoKey
+          key={key.note}
+          note={key}
+          active={lastPlayed === key.note}
+          expected={expectedHandMap.get(key.note) ?? null}
+          finger={expectedFingerMap.get(key.note) ?? null}
+          onPress={handleNotePress}
+        />
+      ))}
+    </div>
+  );
+
   const keyboardPanel = (
     <div className="overflow-x-auto pb-2">
-      <div className="mx-auto" style={{ width: `${whiteKeys.length * 56}px`, minWidth: `${whiteKeys.length * 56}px` }}>
-        <HandsOverlay event={handEvent} keyXMap={keyXMap} width={whiteKeys.length * 56} tick={handTick} />
-        <div className="relative" style={{ width: `${whiteKeys.length * 56}px` }}>
-          <div className="flex items-start">
-            {whiteKeys.map((key) => (
-              <PianoKey
-                key={key.note}
-                note={key}
-                active={lastPlayed === key.note}
-                expected={expectedHandMap.get(key.note) ?? null}
-                finger={expectedFingerMap.get(key.note) ?? null}
-                onPress={handleNotePress}
-              />
-            ))}
-          </div>
-          {blackKeys.map((key) => (
-            <PianoKey
-              key={key.note}
-              note={key}
-              active={lastPlayed === key.note}
-              expected={expectedHandMap.get(key.note) ?? null}
-              finger={expectedFingerMap.get(key.note) ?? null}
-              onPress={handleNotePress}
-            />
-          ))}
-        </div>
+      <div className="mx-auto" style={{ width: `${keyboardWidth}px`, minWidth: `${keyboardWidth}px` }}>
+        <HandsOverlay event={handEvent} keyXMap={keyXMap} width={keyboardWidth} tick={handTick} />
+        {keysBlock}
       </div>
     </div>
   );
@@ -1554,8 +1714,38 @@ export default function VirtualPianoTrainer() {
             </button>
           </div>
         </header>
-        <div className="flex flex-1 items-center justify-center overflow-auto p-4">
-          {keyboardPanel}
+        <div className="flex flex-1 flex-col overflow-auto px-4 pt-4 pb-4 gap-4">
+          <div className="rounded-2xl border border-zinc-800 bg-white p-3 text-zinc-900 shadow-inner md:p-5">
+            <div className="relative">
+              <div ref={staffContainerRef} className="w-full overflow-x-auto" />
+              {staffArrowX != null ? (
+                <div
+                  className="pointer-events-none absolute top-0 transition-all duration-200 ease-out"
+                  style={{ left: `${staffArrowX - 10}px` }}
+                >
+                  <svg width="20" height="14" className="drop-shadow">
+                    <polygon points="0,0 20,0 10,14" fill="#3b82f6" />
+                  </svg>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex-1" />
+          <div className="overflow-x-auto">
+            <div className="mx-auto" style={{ width: `${keyboardWidth}px`, minWidth: `${keyboardWidth}px` }}>
+              <HandsOverlay
+                event={handEvent}
+                keyXMap={keyXMap}
+                width={keyboardWidth}
+                tick={handTick}
+              />
+            </div>
+          </div>
+          <div className="overflow-x-auto pb-2">
+            <div className="mx-auto" style={{ width: `${keyboardWidth}px`, minWidth: `${keyboardWidth}px` }}>
+              {keysBlock}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -1564,8 +1754,8 @@ export default function VirtualPianoTrainer() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 shadow-2xl">
+        <div className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
+          <div className="min-w-0 rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 shadow-2xl">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-xs uppercase tracking-[0.2em] text-zinc-400">
@@ -1643,7 +1833,7 @@ export default function VirtualPianoTrainer() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-5">
+            <div className="mt-6 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
               <StatCard label="Progress" value={`${progress}%`} tone="accent" />
               <StatCard label="Correct" value={correctCount} tone="good" />
               <StatCard label="Wrong" value={wrongCount} tone="bad" />
@@ -1671,12 +1861,24 @@ export default function VirtualPianoTrainer() {
               </div>
 
               <div className="mt-5 rounded-2xl border border-zinc-800 bg-white p-3 text-zinc-900 shadow-inner md:p-5">
-                <div ref={staffContainerRef} className="w-full overflow-x-auto" />
+                <div className="relative">
+                  <div ref={staffContainerRef} className="w-full overflow-x-auto" />
+                  {staffArrowX != null ? (
+                    <div
+                      className="pointer-events-none absolute top-0 transition-all duration-200 ease-out"
+                      style={{ left: `${staffArrowX - 10}px` }}
+                    >
+                      <svg width="20" height="14" className="drop-shadow">
+                        <polygon points="0,0 20,0 10,14" fill="#3b82f6" />
+                      </svg>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-6 min-w-0">
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 shadow-xl">
               <div className="flex items-center justify-between gap-4">
                 <div>

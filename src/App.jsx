@@ -905,6 +905,8 @@ export default function VirtualPianoTrainer() {
   const [selectedInstrument, setSelectedInstrument] = useState(INSTRUMENTS[0].id);
   const [instrumentStatus, setInstrumentStatus] = useState("idle");
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [midiStatus, setMidiStatus] = useState("idle");
+  const [midiDevices, setMidiDevices] = useState([]);
 
   const audioContextRef = useRef(null);
   const previewTimeoutsRef = useRef([]);
@@ -913,6 +915,8 @@ export default function VirtualPianoTrainer() {
   const instrumentRef = useRef(null);
   const instrumentLoadingRef = useRef(null);
   const pressedInEventRef = useRef(new Set());
+  const midiAccessRef = useRef(null);
+  const handleNotePressRef = useRef(null);
 
   const customLesson = useMemo(() => {
     const notes = parseCustomEvents(customInput);
@@ -1053,6 +1057,57 @@ export default function VirtualPianoTrainer() {
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isFocusMode]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.requestMIDIAccess) {
+      setMidiStatus("unsupported");
+      return undefined;
+    }
+
+    let cancelled = false;
+    setMidiStatus("requesting");
+
+    const onMessage = (event) => {
+      const [status, note, velocity] = event.data;
+      const command = status & 0xf0;
+      if (command === 0x90 && velocity > 0) {
+        const noteName = midiToNote(note);
+        handleNotePressRef.current?.(noteName);
+      }
+    };
+
+    const refreshDevices = (access) => {
+      const inputs = [...access.inputs.values()];
+      setMidiDevices(inputs.map((input) => input.name || "Unknown device"));
+      inputs.forEach((input) => {
+        input.onmidimessage = onMessage;
+      });
+    };
+
+    navigator
+      .requestMIDIAccess({ sysex: false })
+      .then((access) => {
+        if (cancelled) return;
+        midiAccessRef.current = access;
+        setMidiStatus("ready");
+        refreshDevices(access);
+        access.onstatechange = () => refreshDevices(access);
+      })
+      .catch(() => {
+        if (!cancelled) setMidiStatus("denied");
+      });
+
+    return () => {
+      cancelled = true;
+      const access = midiAccessRef.current;
+      if (access) {
+        [...access.inputs.values()].forEach((input) => {
+          input.onmidimessage = null;
+        });
+        access.onstatechange = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!isRunning) return undefined;
@@ -1368,6 +1423,8 @@ export default function VirtualPianoTrainer() {
 
     handleRhythmModePress(noteName);
   }
+
+  handleNotePressRef.current = handleNotePress;
 
   function previewLesson() {
     if (!notes.length || isPreviewing) return;
@@ -1703,6 +1760,42 @@ export default function VirtualPianoTrainer() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="flex items-center justify-between text-sm text-zinc-300">
+                    <span>MIDI input</span>
+                    <span
+                      className={`text-xs uppercase tracking-[0.16em] ${
+                        midiStatus === "ready"
+                          ? "text-emerald-300"
+                          : midiStatus === "denied" || midiStatus === "unsupported"
+                          ? "text-rose-300"
+                          : "text-zinc-500"
+                      }`}
+                    >
+                      {midiStatus === "requesting"
+                        ? "Requesting…"
+                        : midiStatus === "ready"
+                        ? midiDevices.length > 0
+                          ? "Connected"
+                          : "No device"
+                        : midiStatus === "denied"
+                        ? "Permission denied"
+                        : midiStatus === "unsupported"
+                        ? "Unsupported"
+                        : "Idle"}
+                    </span>
+                  </div>
+                  {midiDevices.length > 0 ? (
+                    <ul className="mt-2 space-y-1 text-xs text-zinc-400">
+                      {midiDevices.map((name) => (
+                        <li key={name} className="truncate">{name}</li>
+                      ))}
+                    </ul>
+                  ) : midiStatus === "ready" ? (
+                    <div className="mt-2 text-xs text-zinc-500">Plug in a MIDI keyboard to play with real keys.</div>
+                  ) : null}
                 </div>
 
                 <label className="inline-flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">

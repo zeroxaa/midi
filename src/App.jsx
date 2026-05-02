@@ -51,6 +51,14 @@ function loadSalamander() {
               const velocity = Math.min(1, Math.max(0.05, options?.gain ?? 0.7));
               sampler.triggerAttackRelease(note, options?.duration ?? 0.5, undefined, velocity);
             },
+            attack(note, velocity) {
+              Tone.start();
+              const v = Math.min(1, Math.max(0.05, velocity ?? 0.7));
+              sampler.triggerAttack(note, undefined, v);
+            },
+            release(note) {
+              sampler.triggerRelease(note);
+            },
           });
         },
         onerror: (err) => reject(err),
@@ -446,6 +454,84 @@ const BUILT_IN_LESSONS = [
       { rh: ["F#4"], lh: [], beats: 1 },
     ],
   },
+  {
+    id: "canon2hand",
+    title: "Pachelbel's Canon (two hands)",
+    meter: "4/4",
+    notes: [
+      { rh: ["F#5"], lh: ["D3"], beats: 1 },
+      { rh: ["E5"], lh: ["A3"], beats: 1 },
+      { rh: ["D5"], lh: ["D3"], beats: 1 },
+      { rh: ["C#5"], lh: ["A3"], beats: 1 },
+      { rh: ["B4"], lh: ["A2"], beats: 1 },
+      { rh: ["A4"], lh: ["E3"], beats: 1 },
+      { rh: ["B4"], lh: ["A2"], beats: 1 },
+      { rh: ["C#5"], lh: ["E3"], beats: 1 },
+      { rh: ["D5"], lh: ["B2"], beats: 1 },
+      { rh: ["C#5"], lh: ["F#3"], beats: 1 },
+      { rh: ["B4"], lh: ["B2"], beats: 1 },
+      { rh: ["A4"], lh: ["F#3"], beats: 1 },
+      { rh: ["G4"], lh: ["F#2"], beats: 1 },
+      { rh: ["F#4"], lh: ["C#3"], beats: 1 },
+      { rh: ["G4"], lh: ["F#2"], beats: 1 },
+      { rh: ["A4"], lh: ["C#3"], beats: 1 },
+      { rh: ["B4"], lh: ["G2"], beats: 1 },
+      { rh: ["A4"], lh: ["D3"], beats: 1 },
+      { rh: ["G4"], lh: ["G2"], beats: 1 },
+      { rh: ["F#4"], lh: ["D3"], beats: 1 },
+      { rh: ["E4"], lh: ["D3"], beats: 1 },
+      { rh: ["F#4"], lh: ["A3"], beats: 1 },
+      { rh: ["G4"], lh: ["D3"], beats: 1 },
+      { rh: ["A4"], lh: ["A3"], beats: 1 },
+      { rh: ["B4"], lh: ["G2"], beats: 1 },
+      { rh: ["A4"], lh: ["D3"], beats: 1 },
+      { rh: ["G4"], lh: ["G2"], beats: 1 },
+      { rh: ["F#4"], lh: ["D3"], beats: 1 },
+      { rh: ["E4"], lh: ["A2"], beats: 1 },
+      { rh: ["D4"], lh: ["E3"], beats: 1 },
+      { rh: ["E4"], lh: ["A2"], beats: 1 },
+      { rh: ["D4"], lh: ["A2"], beats: 1 },
+    ],
+  },
+  {
+    id: "canon2hand_compact",
+    title: "Pachelbel's Canon (compact, fits C2–C5)",
+    meter: "4/4",
+    notes: [
+      { rh: ["F#4"], lh: ["D3"], beats: 1 },
+      { rh: ["E4"], lh: ["A3"], beats: 1 },
+      { rh: ["D4"], lh: ["D3"], beats: 1 },
+      { rh: ["C#4"], lh: ["A3"], beats: 1 },
+      { rh: ["B3"], lh: ["A2"], beats: 1 },
+      { rh: ["A3"], lh: ["E3"], beats: 1 },
+      { rh: ["B3"], lh: ["A2"], beats: 1 },
+      { rh: ["C#4"], lh: ["E3"], beats: 1 },
+      { rh: ["D4"], lh: ["B2"], beats: 1 },
+      { rh: ["C#4"], lh: ["F#3"], beats: 1 },
+      { rh: ["B3"], lh: ["B2"], beats: 1 },
+      { rh: ["A3"], lh: ["F#3"], beats: 1 },
+      { rh: ["G3"], lh: ["F#2"], beats: 1 },
+      { rh: ["F#3"], lh: ["C#3"], beats: 1 },
+      { rh: ["G3"], lh: ["F#2"], beats: 1 },
+      { rh: ["A3"], lh: ["C#3"], beats: 1 },
+      { rh: ["B3"], lh: ["G2"], beats: 1 },
+      { rh: ["A3"], lh: ["D3"], beats: 1 },
+      { rh: ["G3"], lh: ["G2"], beats: 1 },
+      { rh: ["F#3"], lh: ["D3"], beats: 1 },
+      { rh: ["E3"], lh: ["D3"], beats: 1 },
+      { rh: ["F#3"], lh: ["A3"], beats: 1 },
+      { rh: ["G3"], lh: ["D3"], beats: 1 },
+      { rh: ["A3"], lh: ["A3"], beats: 1 },
+      { rh: ["B3"], lh: ["G2"], beats: 1 },
+      { rh: ["A3"], lh: ["D3"], beats: 1 },
+      { rh: ["G3"], lh: ["G2"], beats: 1 },
+      { rh: ["F#3"], lh: ["D3"], beats: 1 },
+      { rh: ["E3"], lh: ["A2"], beats: 1 },
+      { rh: ["D3"], lh: ["E3"], beats: 1 },
+      { rh: ["E3"], lh: ["A2"], beats: 1 },
+      { rh: ["D3"], lh: ["A2"], beats: 1 },
+    ],
+  },
 ];
 
 const NOTE_TO_SEMITONE = {
@@ -485,7 +571,12 @@ const SHORTCUTS = {
   E5: ";",
 };
 
-const KEYBOARD_RANGE = createKeyboardRange("C2", "C6");
+const KEYBOARD_PRESETS = [
+  { id: "full", label: "Full (C2–C6, 4 oct)", start: "C2", end: "C6" },
+  { id: "flkey37-low", label: "FLkey 37 (C2–C5, 3 oct)", start: "C2", end: "C5" },
+  { id: "flkey37-mid", label: "FLkey 37 alt (C3–C6, 3 oct)", start: "C3", end: "C6" },
+  { id: "compact", label: "Compact (C4–C6, 2 oct)", start: "C4", end: "C6" },
+];
 
 function noteToMidi(note) {
   const match = /^([A-G]#?)(\d)$/.exec(note.trim());
@@ -590,6 +681,14 @@ function eventHandMap(event) {
   return map;
 }
 
+function handNotesOf(event, hand) {
+  if (!event) return [];
+  if (event.rh || event.lh) {
+    return (hand === "rh" ? event.rh : event.lh) ?? [];
+  }
+  return hand === "rh" ? (event.notes ?? [event.note]) : [];
+}
+
 function eventFingerMap(event) {
   const map = new Map();
   const items = event.rh || event.lh
@@ -600,6 +699,90 @@ function eventFingerMap(event) {
     if (finger != null) map.set(toNoteName(item), finger);
   });
   return map;
+}
+
+const WHITE_SEMITONE_MAP = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+
+function noteToWhiteIndex(midi) {
+  if (midi == null) return null;
+  const octave = Math.floor(midi / 12);
+  return octave * 7 + WHITE_SEMITONE_MAP[midi % 12];
+}
+
+function computeAutoFingerings(sequence, hand) {
+  if (!sequence || sequence.length === 0) return [];
+  const whiteIndices = sequence.map((note) => noteToWhiteIndex(noteToMidi(note)));
+  const dir = hand === "rh" ? 1 : -1;
+  const fingers = new Array(sequence.length);
+
+  const assignWindow = (start, end, minW, maxW) => {
+    const anchor = hand === "rh" ? minW : maxW;
+    for (let i = start; i <= end; i++) {
+      const w = whiteIndices[i];
+      if (w == null) {
+        fingers[i] = 3;
+        continue;
+      }
+      const offset = (w - anchor) * dir;
+      fingers[i] = Math.max(1, Math.min(5, offset + 1));
+    }
+  };
+
+  let windowStart = 0;
+  let windowMin = whiteIndices[0];
+  let windowMax = whiteIndices[0];
+  for (let i = 1; i < whiteIndices.length; i++) {
+    const w = whiteIndices[i];
+    if (w == null) continue;
+    const newMin = Math.min(windowMin, w);
+    const newMax = Math.max(windowMax, w);
+    if (newMax - newMin > 4) {
+      assignWindow(windowStart, i - 1, windowMin, windowMax);
+      windowStart = i;
+      windowMin = w;
+      windowMax = w;
+    } else {
+      windowMin = newMin;
+      windowMax = newMax;
+    }
+  }
+  assignWindow(windowStart, whiteIndices.length - 1, windowMin, windowMax);
+  return fingers;
+}
+
+function computeLessonFingerings(events) {
+  const rhSeq = [];
+  const lhSeq = [];
+  const rhPositions = [];
+  const lhPositions = [];
+
+  events.forEach((event, eventIdx) => {
+    const lhSet = new Set((event.lh ?? []).map(toNoteName));
+    const allNotes = eventNotes(event);
+    for (const note of allNotes) {
+      if (lhSet.has(note)) {
+        lhSeq.push(note);
+        lhPositions.push({ eventIdx, note });
+      } else {
+        rhSeq.push(note);
+        rhPositions.push({ eventIdx, note });
+      }
+    }
+  });
+
+  const rhFingers = computeAutoFingerings(rhSeq, "rh");
+  const lhFingers = computeAutoFingerings(lhSeq, "lh");
+
+  const result = new Map();
+  const add = (positions, fingers) => {
+    positions.forEach(({ eventIdx, note }, i) => {
+      if (!result.has(eventIdx)) result.set(eventIdx, new Map());
+      result.get(eventIdx).set(note, fingers[i]);
+    });
+  };
+  add(rhPositions, rhFingers);
+  add(lhPositions, lhFingers);
+  return result;
 }
 
 function lessonUsesHands(lesson) {
@@ -806,7 +989,7 @@ function computeHandLayout(notes, handType, keyXMap) {
   return { fingers };
 }
 
-function Hand({ notes, handType, keyXMap, tick }) {
+function Hand({ notes, handType, keyXMap, tick, animate = true }) {
   const layout = useMemo(() => computeHandLayout(notes, handType, keyXMap), [notes, handType, keyXMap]);
   if (!layout) return null;
 
@@ -841,12 +1024,12 @@ function Hand({ notes, handType, keyXMap, tick }) {
           transition={{ type: "spring", stiffness: 260, damping: 28 }}
         >
           <motion.div
-            key={`${handType}-${f.finger}-${tick}`}
+            key={animate ? `${handType}-${f.finger}-dip-${tick}` : `${handType}-${f.finger}-static`}
             initial={{ y: 0, scale: 1 }}
-            animate={f.active ? { y: [0, 18, 6], scale: [1, 1.1, 1] } : { y: 0, scale: 1 }}
+            animate={f.active && animate ? { y: [0, 18, 6], scale: [1, 1.1, 1] } : { y: 0, scale: 1 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
             className={`h-full w-full rounded-full border border-white/40 shadow-md flex items-end justify-center pb-1 text-[10px] font-bold text-white ${
-              f.active ? fingerActive : fingerBase
+              f.active && animate ? fingerActive : fingerBase
             }`}
           >
             {f.finger}
@@ -857,16 +1040,30 @@ function Hand({ notes, handType, keyXMap, tick }) {
   );
 }
 
-function HandsOverlay({ event, keyXMap, width, tick }) {
-  if (!event) return null;
-  const rhNotes = getHandNotes(event, "rh");
-  const lhNotes = getHandNotes(event, "lh");
+function HandsOverlay({ rhDisplay, lhDisplay, rhFingerMap, lhFingerMap, keyXMap, width, tick }) {
+  const applyFingers = (list, fmap) =>
+    list.map((item) => ({
+      ...item,
+      finger: item.finger ?? fmap?.get(item.note) ?? null,
+    }));
+
+  const rhNotes = rhDisplay
+    ? applyFingers(getHandNotes(rhDisplay.event, "rh"), rhFingerMap)
+    : [];
+  const lhNotes = lhDisplay
+    ? applyFingers(getHandNotes(lhDisplay.event, "lh"), lhFingerMap)
+    : [];
+
   if (rhNotes.length === 0 && lhNotes.length === 0) return null;
 
   return (
     <div className="relative mb-2" style={{ width, height: 100 }}>
-      {rhNotes.length > 0 && <Hand notes={rhNotes} handType="rh" keyXMap={keyXMap} tick={tick} />}
-      {lhNotes.length > 0 && <Hand notes={lhNotes} handType="lh" keyXMap={keyXMap} tick={tick} />}
+      {rhNotes.length > 0 && (
+        <Hand notes={rhNotes} handType="rh" keyXMap={keyXMap} tick={tick} animate={rhDisplay.isCurrent} />
+      )}
+      {lhNotes.length > 0 && (
+        <Hand notes={lhNotes} handType="lh" keyXMap={keyXMap} tick={tick} animate={lhDisplay.isCurrent} />
+      )}
     </div>
   );
 }
@@ -983,7 +1180,9 @@ export default function VirtualPianoTrainer() {
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [midiStatus, setMidiStatus] = useState("idle");
   const [midiDevices, setMidiDevices] = useState([]);
+  const [midiOctaveOffset, setMidiOctaveOffset] = useState(-1);
   const [staffArrowX, setStaffArrowX] = useState(null);
+  const [keyboardPresetId, setKeyboardPresetId] = useState("flkey37-low");
 
   const audioContextRef = useRef(null);
   const previewTimeoutsRef = useRef([]);
@@ -993,7 +1192,11 @@ export default function VirtualPianoTrainer() {
   const instrumentLoadingRef = useRef(null);
   const pressedInEventRef = useRef(new Set());
   const midiAccessRef = useRef(null);
+  const midiOctaveOffsetRef = useRef(0);
   const handleNotePressRef = useRef(null);
+  const attackNoteRef = useRef(null);
+  const releaseNoteRef = useRef(null);
+  const registerPressRef = useRef(null);
 
   const customLesson = useMemo(() => {
     const notes = parseCustomEvents(customInput);
@@ -1030,26 +1233,75 @@ export default function VirtualPianoTrainer() {
   const totalBeats = useMemo(() => notes.reduce((sum, event) => sum + event.beats, 0), [notes]);
   const expectedEvent = notes[currentIndex] ?? null;
   const expectedNotesList = expectedEvent ? eventNotes(expectedEvent) : [];
-  const expectedHandMap = useMemo(
-    () => (expectedEvent ? eventHandMap(expectedEvent) : new Map()),
-    [expectedEvent]
-  );
-  const expectedFingerMap = useMemo(
-    () => (expectedEvent ? eventFingerMap(expectedEvent) : new Map()),
-    [expectedEvent]
-  );
+  const autoFingerings = useMemo(() => computeLessonFingerings(notes), [notes]);
+
+  const displayIndex = isPreviewing && previewIndex >= 0 ? previewIndex : currentIndex;
+  const displayEvent = notes[displayIndex] ?? null;
+
+  const rhDisplay = useMemo(() => {
+    for (let i = displayIndex; i >= 0; i--) {
+      if (handNotesOf(notes[i], "rh").length > 0) {
+        return { event: notes[i], atIndex: i, isCurrent: i === displayIndex };
+      }
+    }
+    return null;
+  }, [notes, displayIndex]);
+
+  const lhDisplay = useMemo(() => {
+    for (let i = displayIndex; i >= 0; i--) {
+      if (handNotesOf(notes[i], "lh").length > 0) {
+        return { event: notes[i], atIndex: i, isCurrent: i === displayIndex };
+      }
+    }
+    return null;
+  }, [notes, displayIndex]);
+
+  const buildFingerMap = (displayState) => {
+    if (!displayState) return new Map();
+    const merged = new Map(autoFingerings.get(displayState.atIndex) ?? []);
+    eventFingerMap(displayState.event).forEach((finger, note) => merged.set(note, finger));
+    return merged;
+  };
+  const rhFingerMap = useMemo(() => buildFingerMap(rhDisplay), [rhDisplay, autoFingerings]);
+  const lhFingerMap = useMemo(() => buildFingerMap(lhDisplay), [lhDisplay, autoFingerings]);
+
+  const displayHandMap = useMemo(() => {
+    const map = new Map();
+    if (rhDisplay) handNotesOf(rhDisplay.event, "rh").forEach((item) => map.set(toNoteName(item), "rh"));
+    if (lhDisplay) handNotesOf(lhDisplay.event, "lh").forEach((item) => map.set(toNoteName(item), "lh"));
+    if (!rhDisplay && !lhDisplay && displayEvent) {
+      eventHandMap(displayEvent).forEach((hand, note) => map.set(note, hand));
+    }
+    return map;
+  }, [rhDisplay, lhDisplay, displayEvent]);
+
+  const displayFingerMap = useMemo(() => {
+    const merged = new Map(rhFingerMap);
+    lhFingerMap.forEach((finger, note) => merged.set(note, finger));
+    return merged;
+  }, [rhFingerMap, lhFingerMap]);
+
+  const activeNoteSet = useMemo(() => {
+    if (isPreviewing && displayEvent) return new Set(eventNotes(displayEvent));
+    return new Set();
+  }, [isPreviewing, displayEvent]);
   const expectedNote = expectedNotesList[0] ?? null;
   const progress = notes.length ? Math.round((currentIndex / notes.length) * 100) : 0;
   const accuracy = correctCount + wrongCount > 0 ? Math.round((correctCount / (correctCount + wrongCount)) * 100) : 100;
   const beatMs = 60000 / bpm;
   const abcSource = useMemo(() => lessonToAbc(currentLesson), [currentLesson]);
 
+  const keyboardRange = useMemo(() => {
+    const preset = KEYBOARD_PRESETS.find((p) => p.id === keyboardPresetId) ?? KEYBOARD_PRESETS[0];
+    return createKeyboardRange(preset.start, preset.end);
+  }, [keyboardPresetId]);
+
   const visibleKeyboard = useMemo(() => {
-    return KEYBOARD_RANGE.map((key) => ({
+    return keyboardRange.map((key) => ({
       ...key,
       shortcut: showShortcuts ? key.shortcut : "",
     }));
-  }, [showShortcuts]);
+  }, [showShortcuts, keyboardRange]);
 
   const whiteKeys = visibleKeyboard.filter((key) => key.white);
   const blackKeys = visibleKeyboard.filter((key) => !key.white);
@@ -1058,8 +1310,7 @@ export default function VirtualPianoTrainer() {
     visibleKeyboard.forEach((key) => map.set(key.note, keyCenterX(key)));
     return map;
   }, [visibleKeyboard]);
-  const handEvent = previewIndex >= 0 ? notes[previewIndex] ?? null : expectedEvent;
-  const handTick = isPreviewing ? previewIndex : currentIndex;
+  const handTick = displayIndex;
 
   useEffect(() => {
     resetSession();
@@ -1171,9 +1422,15 @@ export default function VirtualPianoTrainer() {
     const onMessage = (event) => {
       const [status, note, velocity] = event.data;
       const command = status & 0xf0;
+      const adjusted = note + midiOctaveOffsetRef.current * 12;
+      const noteName = midiToNote(adjusted);
+
       if (command === 0x90 && velocity > 0) {
-        const noteName = midiToNote(note);
-        handleNotePressRef.current?.(noteName);
+        const norm = velocity / 127;
+        attackNoteRef.current?.(noteName, norm);
+        registerPressRef.current?.(noteName);
+      } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
+        releaseNoteRef.current?.(noteName);
       }
     };
 
@@ -1289,7 +1546,27 @@ export default function VirtualPianoTrainer() {
     setInstrumentStatus("loading");
     const loader = config?.source === "salamander"
       ? loadSalamander()
-      : Soundfont.instrument(audioContext, name);
+      : Soundfont.instrument(audioContext, name).then((sf) => {
+          const active = new Map();
+          return {
+            play(note, time, options) {
+              sf.play(note, time, options);
+            },
+            attack(note, velocity) {
+              const handle = sf.play(note, audioContext.currentTime, {
+                gain: Math.min(1, Math.max(0.05, velocity ?? 0.7)),
+              });
+              active.set(note, handle);
+            },
+            release(note) {
+              const handle = active.get(note);
+              if (handle) {
+                handle.stop(audioContext.currentTime);
+                active.delete(note);
+              }
+            },
+          };
+        });
 
     const promise = loader
       .then((player) => {
@@ -1506,11 +1783,10 @@ export default function VirtualPianoTrainer() {
     setCurrentIndex((index) => index + 1);
   }
 
-  function handleNotePress(noteName) {
+  function registerPress(noteName) {
     if (isPreviewing) return;
 
     setLastPlayed(noteName);
-    playTone(noteName);
 
     if (practiceMode === "order") {
       handleOrderModePress(noteName);
@@ -1530,7 +1806,43 @@ export default function VirtualPianoTrainer() {
     handleRhythmModePress(noteName);
   }
 
+  function handleNotePress(noteName) {
+    if (isPreviewing) return;
+    playTone(noteName);
+    registerPress(noteName);
+  }
+
+  async function attackNote(noteName, velocity = 0.7) {
+    const audioContext = getAudioContext();
+    if (!audioContext) return;
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+    ensureInstrument();
+
+    const player = instrumentRef.current?.name === selectedInstrument
+      ? instrumentRef.current.player
+      : null;
+
+    if (player?.attack) {
+      player.attack(noteName, velocity);
+    } else {
+      playOscillatorTone(noteName, 0.5);
+    }
+  }
+
+  function releaseNote(noteName) {
+    const player = instrumentRef.current?.name === selectedInstrument
+      ? instrumentRef.current.player
+      : null;
+    player?.release?.(noteName);
+  }
+
   handleNotePressRef.current = handleNotePress;
+  attackNoteRef.current = attackNote;
+  releaseNoteRef.current = releaseNote;
+  registerPressRef.current = registerPress;
+  midiOctaveOffsetRef.current = midiOctaveOffset;
 
   function previewLesson() {
     if (!notes.length || isPreviewing) return;
@@ -1629,9 +1941,9 @@ export default function VirtualPianoTrainer() {
           <PianoKey
             key={key.note}
             note={key}
-            active={lastPlayed === key.note}
-            expected={expectedHandMap.get(key.note) ?? null}
-            finger={expectedFingerMap.get(key.note) ?? null}
+            active={lastPlayed === key.note || activeNoteSet.has(key.note)}
+            expected={displayHandMap.get(key.note) ?? null}
+            finger={displayFingerMap.get(key.note) ?? null}
             onPress={handleNotePress}
           />
         ))}
@@ -1640,9 +1952,9 @@ export default function VirtualPianoTrainer() {
         <PianoKey
           key={key.note}
           note={key}
-          active={lastPlayed === key.note}
-          expected={expectedHandMap.get(key.note) ?? null}
-          finger={expectedFingerMap.get(key.note) ?? null}
+          active={lastPlayed === key.note || activeNoteSet.has(key.note)}
+          expected={displayHandMap.get(key.note) ?? null}
+          finger={displayFingerMap.get(key.note) ?? null}
           onPress={handleNotePress}
         />
       ))}
@@ -1652,7 +1964,15 @@ export default function VirtualPianoTrainer() {
   const keyboardPanel = (
     <div className="overflow-x-auto pb-2">
       <div className="mx-auto" style={{ width: `${keyboardWidth}px`, minWidth: `${keyboardWidth}px` }}>
-        <HandsOverlay event={handEvent} keyXMap={keyXMap} width={keyboardWidth} tick={handTick} />
+        <HandsOverlay
+          rhDisplay={rhDisplay}
+          lhDisplay={lhDisplay}
+          rhFingerMap={rhFingerMap}
+          lhFingerMap={lhFingerMap}
+          keyXMap={keyXMap}
+          width={keyboardWidth}
+          tick={handTick}
+        />
         {keysBlock}
       </div>
     </div>
@@ -1705,6 +2025,17 @@ export default function VirtualPianoTrainer() {
                 </button>
               </>
             ) : null}
+            <select
+              value={keyboardPresetId}
+              onChange={(event) => setKeyboardPresetId(event.target.value)}
+              className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-blue-500"
+            >
+              {KEYBOARD_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={() => setIsFocusMode(false)}
@@ -1734,7 +2065,10 @@ export default function VirtualPianoTrainer() {
           <div className="overflow-x-auto">
             <div className="mx-auto" style={{ width: `${keyboardWidth}px`, minWidth: `${keyboardWidth}px` }}>
               <HandsOverlay
-                event={handEvent}
+                rhDisplay={rhDisplay}
+                lhDisplay={lhDisplay}
+                rhFingerMap={rhFingerMap}
+                lhFingerMap={lhFingerMap}
                 keyXMap={keyXMap}
                 width={keyboardWidth}
                 tick={handTick}
@@ -1899,17 +2233,39 @@ export default function VirtualPianoTrainer() {
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                   <div className="flex items-center justify-between text-sm text-zinc-300">
                     <span className="flex items-center gap-2"><Clock3 className="h-4 w-4" /> BPM</span>
-                    <span className="font-semibold text-white">{bpm}</span>
+                    <span className="font-semibold text-white">{bpm} ({(60 / bpm).toFixed(1)}s/beat)</span>
                   </div>
                   <input
                     type="range"
-                    min="50"
+                    min="12"
                     max="160"
                     step="1"
                     value={bpm}
                     onChange={(event) => setBpm(Number(event.target.value))}
                     className="mt-3 w-full"
                   />
+                  <div className="mt-3 grid grid-cols-5 gap-1">
+                    {[
+                      { label: "5s", bpm: 12 },
+                      { label: "3s", bpm: 20 },
+                      { label: "2s", bpm: 30 },
+                      { label: "1s", bpm: 60 },
+                      { label: "0.5s", bpm: 120 },
+                    ].map((preset) => (
+                      <button
+                        key={preset.bpm}
+                        type="button"
+                        onClick={() => setBpm(preset.bpm)}
+                        className={`rounded-lg border px-2 py-1 text-xs font-semibold transition ${
+                          bpm === preset.bpm
+                            ? "border-blue-500 bg-blue-600 text-white"
+                            : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500"
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
@@ -1998,6 +2354,43 @@ export default function VirtualPianoTrainer() {
                   ) : midiStatus === "ready" ? (
                     <div className="mt-2 text-xs text-zinc-500">Plug in a MIDI keyboard to play with real keys.</div>
                   ) : null}
+                  <div className="mt-3 flex items-center justify-between text-xs text-zinc-400">
+                    <span>Octave offset</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setMidiOctaveOffset((v) => Math.max(-3, v - 1))}
+                        className="rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200 transition hover:border-zinc-500"
+                      >
+                        −
+                      </button>
+                      <span className="w-8 text-center text-sm font-semibold text-white">
+                        {midiOctaveOffset > 0 ? `+${midiOctaveOffset}` : midiOctaveOffset}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setMidiOctaveOffset((v) => Math.min(3, v + 1))}
+                        className="rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200 transition hover:border-zinc-500"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="text-sm text-zinc-300">Keyboard range</div>
+                  <select
+                    value={keyboardPresetId}
+                    onChange={(event) => setKeyboardPresetId(event.target.value)}
+                    className="mt-3 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm outline-none transition focus:border-blue-500"
+                  >
+                    {KEYBOARD_PRESETS.map((preset) => (
+                      <option key={preset.id} value={preset.id}>
+                        {preset.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <label className="inline-flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">
